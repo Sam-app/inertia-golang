@@ -2,14 +2,21 @@ package main
 
 import (
 	"fmt"
-
-	"example.com/inertia-golang/models"
+	"log"
+	"net/http"
 )
 
-func main() {
-	p1 := &models.Page{Title: "TestPage", Body: []byte("This is a sample Page.")}
-	p1.Save()
+func handler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
+}
 
-	p2, _ := models.LoadPage("TestPage")
-	fmt.Println(string(p2.Body))
+func viewHandler(w http.ResponseWriter, r *http.Request) {
+	title := r.URL.Path[len("/view/"):]
+	fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", title, "body")
+}
+
+func main() {
+	http.HandleFunc("/view/", viewHandler)
+	// http.HandleFunc("/", handler)
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
