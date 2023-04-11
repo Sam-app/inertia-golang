@@ -8,11 +8,15 @@ import (
 	"example.com/inertia-golang/models"
 )
 
+func renderTemplate(w http.ResponseWriter, tmpl string, p *models.Page) {
+	t, _ := template.ParseFiles(tmpl + ".html")
+	t.Execute(w, p)
+}
+
 func viewHandler(w http.ResponseWriter, r *http.Request) {
 	title := r.URL.Path[len("/view/"):]
 	p, _ := models.LoadPage(title)
-	t, _ := template.ParseFiles("templates/view.html")
-	t.Execute(w, p)
+	renderTemplate(w, "templates/view", p)
 }
 func editHandler(w http.ResponseWriter, r *http.Request) {
 	title := r.URL.Path[len("/edit/"):]
@@ -20,8 +24,7 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		p = &models.Page{Title: title}
 	}
-	t, _ := template.ParseFiles("templates/edit.html")
-	t.Execute(w, p)
+	renderTemplate(w, "templates/edit", p)
 }
 
 func main() {
