@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"text/template"
@@ -11,7 +10,9 @@ import (
 
 func viewHandler(w http.ResponseWriter, r *http.Request) {
 	title := r.URL.Path[len("/view/"):]
-	fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", title, "body")
+	p, _ := models.LoadPage(title)
+	t, _ := template.ParseFiles("templates/view.html")
+	t.Execute(w, p)
 }
 func editHandler(w http.ResponseWriter, r *http.Request) {
 	title := r.URL.Path[len("/edit/"):]
@@ -22,6 +23,7 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 	t, _ := template.ParseFiles("templates/edit.html")
 	t.Execute(w, p)
 }
+
 func main() {
 	http.HandleFunc("/view/", viewHandler)
 	http.HandleFunc("/edit/", editHandler)
