@@ -1,0 +1,4 @@
+github.com/petaki/inertia-go v1.5.0 h1:ab5iyBVdAAMIHvAhTOG5UTCIkYnJQ/SuIFiKQm6eDYU=
+github.com/petaki/inertia-go v1.5.0/go.mod h1:0oATJU1bvDxYjCDE2Sms4j33hdMqePlpZ3cAIUvzPeA=
+github.com/petaki/support-go v1.7.0 h1:ufkAtV9quMOgKj+748PIkG65UxeEut0gKbkm6SNgCWI=
+github.com/petaki/support-go v1.7.0/go.mod h1:hY+fCu0dAG5XJnTdzzIW2e+gkyq2nBLuFVrhbDs0QP4=

@@ -1,43 +1,53 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
-	"text/template"
 
-	"example.com/inertia-golang/models"
+	"example.com/inertia-golang/static"
+	"github.com/petaki/inertia-go"
+	"github.com/petaki/support-go/mix"
 )
 
-func renderTemplate(w http.ResponseWriter, tmpl string, p *models.Page) {
-	t, _ := template.ParseFiles(tmpl + ".html")
-	t.Execute(w, p)
-}
-
-func viewHandler(w http.ResponseWriter, r *http.Request) {
-	title := r.URL.Path[len("/view/"):]
-	p, _ := models.LoadPage(title)
-	renderTemplate(w, "templates/view", p)
-}
-func editHandler(w http.ResponseWriter, r *http.Request) {
-	title := r.URL.Path[len("/edit/"):]
-	p, err := models.LoadPage(title)
-	if err != nil {
-		p = &models.Page{Title: title}
-	}
-	renderTemplate(w, "templates/edit", p)
-}
-
-func saveHandler(w http.ResponseWriter, r *http.Request) {
-	title := r.URL.Path[len("/save/"):]
-	body := r.FormValue("body")
-	p := &models.Page{Title: title, Body: []byte(body)}
-	p.Save()
-	http.Redirect(w, r, "/view/"+title, http.StatusFound)
-}
+var (
+	url          = "http://localhost:8080"
+	rootTemplate = "resources/views/app.gohtml"
+	// version      = ""
+)
 
 func main() {
-	http.HandleFunc("/view/", viewHandler)
-	http.HandleFunc("/edit/", editHandler)
-	http.HandleFunc("/save/", saveHandler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	mixManager := mix.New("", "./static", "")
+
+	var version string
+	var err error
+
+	version, err = mixManager.Hash("")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	inertiaManager := inertia.New(url, rootTemplate, version)
+
+	mux := http.NewServeMux()
+	mux.Handle("/", inertiaManager.Middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		inertiaManager.Share("title", "Inertia Golang")
+		inertiaManager.ShareFunc("asset", func(path string) (string, error) {
+			return url + "/" + path, nil
+		})
+		err := inertiaManager.Render(w, r, "home/Index", map[string]interface{}{
+			"title": "Inertia Golang",
+		})
+		if err != nil {
+			fmt.Println(err, "inertia render error")
+		}
+
+	})))
+	var fileServer http.Handler
+
+	staticFS := http.FS(static.Files)
+	fileServer = http.FileServer(staticFS)
+
+	mux.Handle("/js/", fileServer)
+	log.Fatal(http.ListenAndServe(":8080", mux))
 }
