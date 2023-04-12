@@ -1,5 +1,17 @@
 {
   "cSpell.words": [
+    "ampproject",
+    "gohtml",
+    "inertiajs",
+    "petaki",
+    "stylesheet",
     "tmpl"
+  ],
+  //ignore file paths
+  "cSpell.ignorePaths": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/coverage/**"
   ]
 }
